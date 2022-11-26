@@ -4,14 +4,15 @@ class Category:
         self.total = 0.00
         self.ledger = list()
     
-    def __repr__(self):
-        title_line = f"{self.name:*^30}\n"
-        accumlated = 0
+    def __repr__(self) -> str:
+        title_line = self.name.center(30, '*') + '\n'
+        #accumlated = 0 
         for item in self.ledger:
-            title_line += f"{item['description'][0:24]}{item['amount']:>{30-len(item['description'])}}\n"
-            accumlated += item["amount"]
-        title_line += f"Total: {(self.total)}"
-        return title_line
+            item["amount"] = format(item["amount"], '.2f')
+            title_line += f"{item['description'][0:23]}{item['amount']:>{30-len(item['description'][0:23])}}\n"
+            #accumlated += item["amount"]
+        title_line += f"Total: {(format(self.total, '.2f'))}\n"
+        return title_line 
     
     def deposit(self, amount, description = ""):
         self.total += amount
@@ -40,10 +41,10 @@ class Category:
             return False
         return True
 
-food = Category("Food")
+food = Category("Entertainment")
 food.deposit(1000, "initial deposit")
-food.withdraw(10.15, "groceries")
-food.withdraw(15.89, "restaurant and more food for dessert")
+food.withdraw(10, "groceries")
+food.withdraw(15, "restaurant and more food for dessert")
 print(food.get_balance())
 clothing = Category("Clothing")
 food.transfer(50, clothing)
@@ -54,26 +55,103 @@ print(str(food))
 
 
 def create_spend_chart(categories):
-    t = "Percentage spent by category\n"
-    total = 0
-    cats = {}
-    #get total of all withdrawals
+    cats_list = []
+    withd_list = []
     for category in categories:
-        cats_total = 0
-
+        cats = category.Category
+        cats_list.append(cats)
+        long_length = (len(max(cats_list, key=len)))
+        padded = [word.ljust(long_length) for word in cats_list]
+        #getting abs_total for percentage
+        w_total =0
         for item in category.ledger:
             amount = item["amount"]
-            if int(amount) < 0:
-                total += amount
-                cats_total += amount
-        cats[category.name] = abs(cats_total)
-    print(cats)
-    total = abs(total)
-    for key, val in cats.items():
-        print(key, val)
-        percentage = (int(val) /total)*100
+            if amount <0:
+                w_total+= amount
+        withd_list.append(w_total)
+    total = int(round(sum(withd_list)))
+    percents = []
+    for val in withd_list:
+        per = (val*100)/total
+        per = round(per//10)*10
+        percents.append(per)
 
-    for n in range(100, -1, -10):
-        t += f'''{str(n) + '|':>4}\n'''
-    print(t)
+    #coding for chart
+    padded = [word.ljust(long_length) for word in cats_list]
+    chart = "Percentage spent by category\n"
+    for num in range(100, -1, -10):
+        chart += f"{str(num) + '|':>4}"
+        for percent in percents:
+            if percent >= num:
+                chart += " o "
+            else:
+                chart += "   "
+        chart += ' \n'
+    chart += "    " + ("-"*((len(cats_list)+2)*2)) +'\n'
+    for row in zip(*padded):
+        chart += "     " + ('  '.join(row)) +'  \n'
+    return chart.rstrip("\n")
 create_spend_chart([food])
+
+    # t = "Percentage spent by category\n"
+    # total = 0
+    # cats = {}
+
+    # #get total of all withdrawals
+    # for category in categories:
+    #     cats_total = 0
+
+    #     for item in category.ledger:
+    #         amount = float(item["amount"])
+    #         if float(amount) < 0:
+    #             total += amount
+    #             cats_total += amount
+    #     cats[category.name] = abs(cats_total)
+    # #print(cats)
+    # total = abs(total)
+    # for key, val in cats.items():
+    #     percentage = (int(val) /total)*100
+    #     cats[key] = percentage
+    # #print(cats)
+
+    # for n in range(100, -1, -10):
+    #     t += f'''{str(n) + '|':>4}'''
+    #     for val in cats.values():
+    #         if val >= n:
+    #             t +=  " o "
+    #     t += "\n"
+    
+    # l = len(cats.values())
+    # print(cats.values())
+    # t += f"    {(l*3 +1) * '-'}\n"
+
+    # i = 0
+    # while True:
+    #     try:
+    #         tempo_string = ""
+    #         for key in cats.keys():
+    #             #print(key)
+    #             tempo_string += (key[i]).ljust(3)
+    #         i += 1
+    #         t += f"     {tempo_string}\n"
+    #     except:
+    #         break
+          
+    # return print(t)
+    # categories  = ['Food', 'Auto', 'Clothing']
+    # chart = "Percentage spent by category\n"
+    # long_length = (len(max(categories, key=len)))
+    # padded = [cats.ljust(long_length) for cats in categories]
+    # percentages = [10, 70, 30]
+    # for num in range(100, -1, -10):
+    #     chart += f"{str(num) + '|':>4}"
+    #     for percent in percentages:
+    #         if percent >= num:
+    #             chart += " o "
+    #         else:
+    #             chart += "   "
+    #     chart += ' \n'
+    # chart += "    " + "-"*10 +'\n'
+    # for category in zip(*padded):
+    #     chart += "     " + ('  '.join(category)) +'  \n'
+    # print(chart.rstrip("\n"))
