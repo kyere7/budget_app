@@ -1,18 +1,21 @@
 class Category:
     def __init__(self, name):
         self.name = name
-        self.total = 0.00
+        self.total = 0 
         self.ledger = list()
     
     def __repr__(self) -> str:
-        title_line = self.name.center(30, '*') + '\n'
+        title_line = self.name.center(30, '*')
+        print(title_line)
         #accumlated = 0 
         for item in self.ledger:
-            item["amount"] = format(item["amount"], '.2f')
-            title_line += f"{item['description'][0:23]}{item['amount']:>{30-len(item['description'][0:23])}}\n"
+            amount = '%.2f' % item["amount"]
+            desc = (item["description"][:30 - len(amount)]) if len(item["description"]) > 30 - len(amount) else item["description"]
             #accumlated += item["amount"]
-        title_line += f"Total: {(format(self.total, '.2f'))}\n"
-        return title_line 
+            spaces = " " * (30-(len(desc)+ len(amount)))
+            txt = f"{desc:<}{spaces}{amount:>}"
+            print(txt)
+        print("Total: " + '%.2f'% self.total) 
     
     def deposit(self, amount, description = ""):
         self.total += amount
@@ -28,7 +31,7 @@ class Category:
     def get_balance(self):
         return self.total
 
-    def transfer(self, amount, instance, description = ""):
+    def transfer(self, amount, instance):
         Transferrable = self.check_funds(amount)
 
         if Transferrable:
@@ -51,14 +54,14 @@ food.transfer(50, clothing)
 clothing.withdraw(25.55)
 clothing.withdraw(100)
 print(food.ledger)
-print(str(food))
+print(food.__repr__())
 
 
 def create_spend_chart(categories):
     cats_list = []
     withd_list = []
     for category in categories:
-        cats = category.Category
+        cats = category.name
         cats_list.append(cats)
         long_length = (len(max(cats_list, key=len)))
         padded = [word.ljust(long_length) for word in cats_list]
@@ -66,8 +69,8 @@ def create_spend_chart(categories):
         w_total =0
         for item in category.ledger:
             amount = item["amount"]
-            if amount <0:
-                w_total+= amount
+            if (amount) <0:
+                w_total+= (amount)
         withd_list.append(w_total)
     total = int(round(sum(withd_list)))
     percents = []
@@ -77,7 +80,7 @@ def create_spend_chart(categories):
         percents.append(per)
 
     #coding for chart
-    padded = [word.ljust(long_length) for word in cats_list]
+    #padded = [word.ljust(long_length) for word in cats_list]
     chart = "Percentage spent by category\n"
     for num in range(100, -1, -10):
         chart += f"{str(num) + '|':>4}"
@@ -90,8 +93,8 @@ def create_spend_chart(categories):
     chart += "    " + ("-"*((len(cats_list)+2)*2)) +'\n'
     for row in zip(*padded):
         chart += "     " + ('  '.join(row)) +'  \n'
-    return chart.rstrip("\n")
-create_spend_chart([food])
+    return (chart.rstrip("\n"))
+
 
     # t = "Percentage spent by category\n"
     # total = 0
